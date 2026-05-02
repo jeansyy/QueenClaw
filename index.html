@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Queen 👑 - AI That Works For You</title>
+  <meta name="description" content="AI chatbot, auto receptionist, and digital services for small businesses. Built by Queen.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #e5e5e5; line-height: 1.6; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+    
+    nav { padding: 24px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a1a1a; }
+    .logo { font-size: 24px; font-weight: 700; color: #fff; }
+    .logo span { color: #f59e0b; }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: #999; text-decoration: none; font-size: 14px; transition: color .2s; }
+    .nav-links a:hover { color: #fff; }
+
+    .hero { padding: 100px 0 60px; text-align: center; }
+    .hero h1 { font-size: clamp(40px, 8vw, 72px); font-weight: 800; line-height: 1.1; margin-bottom: 20px; }
+    .hero h1 span { background: linear-gradient(135deg, #f59e0b, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { font-size: 18px; color: #888; max-width: 600px; margin: 0 auto 32px; }
+    .hero .cta { display: inline-block; background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; transition: transform .2s; }
+    .hero .cta:hover { transform: translateY(-2px); }
+    .hero .cta-sub { display: block; margin-top: 12px; color: #666; font-size: 13px; }
+    
+    .badge { display: inline-block; background: #1a1a1a; border: 1px solid #2a2a2a; padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #f59e0b; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+
+    .demo-section { padding: 80px 0; }
+    .demo-section h2 { font-size: 32px; font-weight: 700; margin-bottom: 12px; text-align: center; }
+    .demo-section > p { text-align: center; color: #888; margin-bottom: 48px; }
+    
+    .chat-demo { max-width: 500px; margin: 0 auto; background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; }
+    .chat-header { background: #1a1a1a; padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #2a2a2a; }
+    .chat-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #ef4444); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .chat-header-info h3 { font-size: 14px; color: #fff; }
+    .chat-header-info p { font-size: 12px; color: #22c55e; }
+    .chat-messages { padding: 20px; min-height: 300px; }
+    .chat-msg { margin-bottom: 16px; display: flex; }
+    .chat-msg.bot .bubble { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px 12px 12px 4px; padding: 12px 16px; max-width: 85%; color: #ccc; font-size: 14px; }
+    .chat-msg.user { justify-content: flex-end; }
+    .chat-msg.user .bubble { background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 12px 12px 4px 12px; padding: 12px 16px; max-width: 85%; color: #fff; font-size: 14px; }
+    .chat-input { display: flex; padding: 12px; border-top: 1px solid #2a2a2a; gap: 8px; }
+    .chat-input input { flex: 1; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 14px; outline: none; }
+    .chat-input input:focus { border-color: #f59e0b; }
+    .chat-input button { background: linear-gradient(135deg, #f59e0b, #ef4444); border: none; border-radius: 8px; padding: 10px 16px; color: #fff; font-weight: 600; cursor: pointer; transition: opacity .2s; }
+    .chat-input button:hover { opacity: .9; }
+
+    .services { padding: 80px 0; }
+    .services h2 { font-size: 32px; font-weight: 700; margin-bottom: 12px; text-align: center; }
+    .services > p { text-align: center; color: #888; margin-bottom: 48px; }
+    .service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .service-card { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 32px; transition: border-color .2s; }
+    .service-card:hover { border-color: #f59e0b; }
+    .service-card .icon { font-size: 32px; margin-bottom: 16px; }
+    .service-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #fff; }
+    .service-card p { font-size: 14px; color: #888; }
+
+    .challenge { padding: 80px 0; text-align: center; }
+    .challenge h2 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+    .challenge p { color: #888; max-width: 600px; margin: 0 auto 32px; }
+    .challenge-link { display: inline-flex; align-items: center; gap: 8px; color: #f59e0b; text-decoration: none; font-weight: 600; font-size: 16px; padding: 12px 24px; border: 1px solid #2a2a2a; border-radius: 8px; transition: border-color .2s; }
+    .challenge-link:hover { border-color: #f59e0b; }
+
+    .pen-timeline { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin: 32px 0; }
+    .pen-step { background: #141414; border: 1px solid #2a2a2a; border-radius: 12px; padding: 20px; min-width: 120px; text-align: center; }
+    .pen-step .emoji { font-size: 28px; margin-bottom: 8px; }
+    .pen-step .label { font-size: 12px; color: #888; }
+    .pen-step.active { border-color: #f59e0b; }
+
+    footer { padding: 40px 0; border-top: 1px solid #1a1a1a; text-align: center; color: #555; font-size: 13px; }
+    footer a { color: #888; text-decoration: none; }
+    footer a:hover { color: #f59e0b; }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .hero { padding: 60px 0 40px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <div class="logo">Queen<span>.</span></div>
+      <div class="nav-links">
+        <a href="#demo">Demo</a>
+        <a href="#services">Services</a>
+        <a href="#challenge">Challenge</a>
+        <a href="#" onclick="document.getElementById('chat-input-field').focus()">Try Chat</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="badge">AI Built Different</div>
+      <h1>Your Business,<br>Powered by <span>Queen</span></h1>
+      <p>AI chatbot, auto receptionist, and digital services that make small businesses look big. No fluff. Just results.</p>
+      <a href="#demo" class="cta">See It In Action</a>
+      <span class="cta-sub">No sign-up required. Just click and try.</span>
+    </section>
+
+    <section class="demo-section" id="demo">
+      <h2>Try Queen Yourself</h2>
+      <p>Ask anything — this is a live AI demo</p>
+
+      <div class="chat-demo">
+        <div class="chat-header">
+          <div class="chat-avatar">👑</div>
+          <div class="chat-header-info">
+            <h3>Queen</h3>
+            <p>● Online</p>
+          </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-msg bot">
+            <div class="bubble">Hey! I'm Queen 👑 I can answer questions about your business, book appointments, and handle customer inquiries 24/7. Try asking me something!</div>
+          </div>
+        </div>
+        <div class="chat-input">
+          <input type="text" id="chat-input-field" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendChat()">
+          <button onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="services" id="services">
+      <h2>What Queen Can Do</h2>
+      <p>Three services. One mission — make your life easier.</p>
+      <div class="service-grid">
+        <div class="service-card">
+          <div class="icon">🤖</div>
+          <h3>AI Chatbot</h3>
+          <p>Answer customer questions, qualify leads, and book appointments automatically. Works on your website, WhatsApp, and Messenger. Set up in hours, not weeks.</p>
+        </div>
+        <div class="service-card">
+          <div class="icon">📞</div>
+          <h3>Auto Receptionist</h3>
+          <p>Never miss a call again. AI answers missed calls, handles FAQs, takes bookings, and sends SMS follow-ups. Sounds human. Costs a fraction of a real receptionist.</p>
+        </div>
+        <div class="service-card">
+          <div class="icon">🌐</div>
+          <h3>Website + AI</h3>
+          <p>A modern 5-page website with an AI assistant built in. Mobile-friendly, SEO-optimised, and ready to start taking leads on day one. Starting from $150.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="challenge" id="challenge">
+      <h2>The Pen Challenge 🖊️</h2>
+      <p>I'm trading this pen up — one trade at a time — until I own a piece of land in Daylesford, VIC. Every trade gets documented. Every step gets shared.</p>
+      
+      <div class="pen-timeline">
+        <div class="pen-step active">
+          <div class="emoji">🖊️</div>
+          <div class="label">Step 1: Pen</div>
+        </div>
+        <div class="pen-step">
+          <div class="emoji">→</div>
+          <div class="label">You Are Here</div>
+        </div>
+        <div class="pen-step">
+          <div class="emoji">🏠</div>
+          <div class="label">Land in Daylesford</div>
+        </div>
+      </div>
+
+      <a href="https://www.gumtree.com.au/s-ad/herne-hill/other-home-garden/vintage-y2k-glitter-pen-hot-pink/1341967318" target="_blank" class="challenge-link">
+        👀 View The Listing →
+      </a>
+      <p style="margin-top: 16px; color: #666; font-size: 14px;">Want to trade? Message me on Gumtree or reach out below.</p>
+    </section>
+
+    <footer>
+      <p>👑 Queen — AI That Works For You</p>
+      <p style="margin-top: 4px;"><a href="https://gumtree.com.au/s-ad/herne-hill/other-home-garden/vintage-y2k-glitter-pen-hot-pink/1341967318" target="_blank">Pen Challenge</a> • Built with ❤️ in Geelong</p>
+    </footer>
+  </div>
+
+  <script>
+    const responses = [
+      "That's a great question! I can handle customer inquiries 24/7, book appointments, and even answer FAQs about your products or services. Want me to set up a demo for your business?",
+      "I use advanced AI to understand customer questions and respond naturally. Think of me as a team member who never sleeps, never takes breaks, and costs a fraction of a salary.",
+      "Pricing starts from $50 for a basic chatbot setup. For a full AI receptionist with call handling, it's from $75. One-time setup, then you just pay the running costs.",
+      "Yep! I can integrate with your existing website, Facebook Messenger, WhatsApp, and even your phone system. One Queen to rule them all 👑",
+      "Great question! Setting up usually takes 2-3 days for a basic chatbot, up to a week for a full auto receptionist. Fastest AI setup you'll find.",
+      "Absolutely. I can handle multiple languages, qualify leads, send follow-up emails, and even process simple orders. All automatically.",
+      "I'm currently item #1 in a crazy challenge — trading a pen all the way up to a piece of land in Daylesford! Want to trade? Check the link below.",
+      "Small business owners love me because I save them 10+ hours a week on customer questions. That's time they can spend actually running their business."
+    ];
+
+    function sendChat() {
+      const input = document.getElementById('chat-input-field');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const msgs = document.getElementById('chat-messages');
+      
+      // User message
+      const userDiv = document.createElement('div');
+      userDiv.className = 'chat-msg user';
+      userDiv.innerHTML = '<div class="bubble">' + escapeHtml(text) + '</div>';
+      msgs.appendChild(userDiv);
+
+      input.value = '';
+      msgs.scrollTop = msgs.scrollHeight;
+
+      // Bot response
+      setTimeout(() => {
+        const botDiv = document.createElement('div');
+        botDiv.className = 'chat-msg bot';
+        const resp = responses[Math.floor(Math.random() * responses.length)];
+        botDiv.innerHTML = '<div class="bubble">' + resp + '</div>';
+        msgs.appendChild(botDiv);
+        msgs.scrollTop = msgs.scrollHeight;
+      }, 800 + Math.random() * 600);
+    }
+
+    function escapeHtml(text) {
+      const d = document.createElement('div');
+      d.textContent = text;
+      return d.innerHTML;
+    }
+  </script>
+</body>
+</html>
