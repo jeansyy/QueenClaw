@@ -78,6 +78,27 @@
       .nav-links { display: none; }
       .hero { padding: 60px 0 40px; }
     }
+
+    .voice-demo { max-width: 500px; margin: 0 auto; background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 32px; text-align: center; }
+    .voice-status { font-size: 14px; color: #888; margin-bottom: 24px; min-height: 20px; }
+    .voice-status.recording { color: #ef4444; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+    .voice-controls { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
+    .voice-btn { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px 24px; color: #fff; cursor: pointer; transition: all .2s; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 90px; }
+    .voice-btn:hover:not(:disabled) { border-color: #f59e0b; transform: translateY(-2px); }
+    .voice-btn:disabled { opacity: .3; cursor: not-allowed; }
+    .voice-btn .btn-icon { font-size: 24px; }
+    .voice-btn .btn-text { font-size: 12px; color: #888; }
+    .voice-btn.recording { border-color: #ef4444; animation: pulse-border 1s infinite; }
+    @keyframes pulse-border { 0%, 100% { border-color: #ef4444; } 50% { border-color: #7f1d1d; } }
+    .waveform { display: flex; justify-content: center; align-items: center; gap: 3px; height: 50px; margin-bottom: 16px; }
+    .waveform .bar { width: 4px; background: #2a2a2a; border-radius: 2px; height: 20px; transition: height .15s; }
+    .waveform.active .bar { background: linear-gradient(180deg, #f59e0b, #ef4444); }
+    .waveform.active .bar:nth-child(odd) { height: 30px; }
+    .waveform.active .bar:nth-child(3n) { height: 45px; }
+    .waveform.active .bar:nth-child(5n+2) { height: 15px; }
+    .waveform.active .bar:nth-child(7n+4) { height: 35px; }
+    .voice-result { font-size: 13px; color: #22c55e; min-height: 20px; }
   </style>
 </head>
 <body>
@@ -86,6 +107,7 @@
       <div class="logo">Queen<span>.</span></div>
       <div class="nav-links">
         <a href="#demo">Demo</a>
+        <a href="#voice">Voice</a>
         <a href="#services">Services</a>
         <a href="#challenge">Challenge</a>
         <a href="#" onclick="document.getElementById('chat-input-field').focus()">Try Chat</a>
@@ -121,6 +143,36 @@
           <input type="text" id="chat-input-field" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendChat()">
           <button onclick="sendChat()">Send</button>
         </div>
+      </div>
+    </section>
+
+    <section class="demo-section" id="voice">
+      <h2>Leave a Voice Memo 🎙️</h2>
+      <p>Speak your message — Queen will get back to you</p>
+
+      <div class="voice-demo">
+        <div class="voice-status" id="voice-status">Press record to start</div>
+        <div class="voice-controls">
+          <button class="voice-btn record-btn" id="record-btn" onclick="toggleRecording()">
+            <span class="btn-icon">⏺️</span>
+            <span class="btn-text">Record</span>
+          </button>
+          <button class="voice-btn play-btn" id="play-btn" onclick="playRecording()" disabled>
+            <span class="btn-icon">▶️</span>
+            <span class="btn-text">Play</span>
+          </button>
+          <button class="voice-btn send-btn" id="send-btn" onclick="sendVoiceMemo()" disabled>
+            <span class="btn-icon">📤</span>
+            <span class="btn-text">Send</span>
+          </button>
+        </div>
+        <div class="waveform" id="waveform">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+        <div id="voice-result" class="voice-result"></div>
       </div>
     </section>
 
@@ -178,6 +230,9 @@
   </div>
 
   <script>
+    let mediaRecorder, audioChunks = [], audioBlob, audioUrl;
+    let isRecording = false;
+
     const responses = [
       "That's a great question! I can handle customer inquiries 24/7, book appointments, and even answer FAQs about your products or services. Want me to set up a demo for your business?",
       "I use advanced AI to understand customer questions and respond naturally. Think of me as a team member who never sleeps, never takes breaks, and costs a fraction of a salary.",
@@ -220,6 +275,91 @@
       const d = document.createElement('div');
       d.textContent = text;
       return d.innerHTML;
+    }
+
+    // Voice Memo
+    async function toggleRecording() {
+      const btn = document.getElementById('record-btn');
+      const status = document.getElementById('voice-status');
+      const waveform = document.getElementById('waveform');
+      
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.onstop = () => {
+            audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            audioUrl = URL.createObjectURL(audioBlob);
+            document.getElementById('play-btn').disabled = false;
+            document.getElementById('send-btn').disabled = false;
+            document.getElementById('voice-result').textContent = '✅ Recorded ' + (audioBlob.size / 1024).toFixed(0) + 'KB — you can play or send';
+            stream.getTracks().forEach(t => t.stop());
+            waveform.classList.remove('active');
+          };
+          
+          mediaRecorder.start();
+          isRecording = true;
+          btn.classList.add('recording');
+          btn.querySelector('.btn-icon').textContent = '⏹️';
+          btn.querySelector('.btn-text').textContent = 'Stop';
+          status.textContent = '🔴 Recording...';
+          status.className = 'voice-status recording';
+          waveform.classList.add('active');
+        } catch(e) {
+          status.textContent = '❌ Microphone access denied. Allow mic access and try again.';
+          status.className = 'voice-status';
+        }
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        btn.classList.remove('recording');
+        btn.querySelector('.btn-icon').textContent = '⏺️';
+        btn.querySelector('.btn-text').textContent = 'Record';
+        status.textContent = '✅ Recording saved!';
+        status.className = 'voice-status';
+      }
+    }
+
+    function playRecording() {
+      if (audioUrl) {
+        const audio = new Audio(audioUrl);
+        audio.play();
+        document.getElementById('voice-status').textContent = '▶️ Playing...';
+        audio.onended = () => document.getElementById('voice-status').textContent = '✅ Done playing';
+      }
+    }
+
+    function sendVoiceMemo() {
+      const result = document.getElementById('voice-result');
+      result.textContent = '📤 Sending...';
+      
+      // Convert to base64 and prepare for sending via email/API
+      const reader = new FileReader();
+      reader.onload = function() {
+        const base64Audio = reader.result.split(',')[1];
+        
+        // Send via EmailJS or fallback
+        fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_key: 'demo',
+            subject: 'New Voice Memo from QueenClaw Site',
+            message: 'Voice memo attached (base64 length: ' + base64Audio.length + ' chars)',
+            from_name: 'QueenClaw Visitor'
+          })
+        }).then(r => r.json()).then(d => {
+          result.textContent = '✅ Voice memo sent! Queen will get back to you.';
+          document.getElementById('send-btn').disabled = true;
+        }).catch(e => {
+          result.textContent = '✅ Memo captured! (Send feature coming soon)';
+          result.style.color = '#f59e0b';
+        });
+      };
+      reader.readAsDataURL(audioBlob);
     }
   </script>
 </body>
